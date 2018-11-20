@@ -22,6 +22,8 @@
 require "yast"
 require "cwm/dialog"
 require "y2caasp/widgets/ntp_server"
+require "y2caasp/widgets/container_registry_host"
+require "y2caasp/widgets/container_registry_namespace"
 require "y2caasp/dhcp_ntp_servers"
 
 module Y2Caasp
@@ -54,9 +56,13 @@ module Y2Caasp
 
       @content = HSquash(
         MinWidth(50,
-          # preselect the servers from the DHCP response
-          Y2Caasp::Widgets::NtpServer.new(ntp_servers))
-      )
+                 VBox(
+                   # preselect the servers from the DHCP response
+                   Y2Caasp::Widgets::NtpServer.new(ntp_servers),
+                   VSpacing(2),
+                   Y2Caasp::Widgets::ContainerRegistryHost.new("registry.suse.com"),
+                   VSpacing(1),
+                   Y2Caasp::Widgets::ContainerRegistryNamespace.new("sles"))))
     end
 
   private

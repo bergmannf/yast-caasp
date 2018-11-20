@@ -24,6 +24,7 @@ require "yast2/execute"
 require "installation/system_role"
 require "installation/services"
 require "cfa/chrony_conf"
+require "y2caasp/cfa/registry_conf"
 
 module Y2SystemRoleHandlers
   # Implement finish handler for the "dashboard" role
@@ -36,6 +37,7 @@ module Y2SystemRoleHandlers
     def run
       run_activation_script
       setup_ntp
+      update_registry_conf
     end
 
   protected
@@ -68,6 +70,16 @@ module Y2SystemRoleHandlers
         chrony_conf.add_pool(server)
       end
       chrony_conf.save
+    end
+
+    def update_registry_conf
+      log.info "Writing new registry configuration: host #{role['registry_host']} namespace #{role['registry_namespace']}"
+      return unless (role["registry_host"] && role["registry_namespace"])
+      registry_conf = ::Y2Caasp::CFA::RegistryConf.new
+      registry_conf.load
+      registry_conf.host = role["registry_host"]
+      registry_conf.namespace = role["registry_namespace"]
+      registry_conf.save
     end
 
     # Add the ntpd service to the list of services to enable
